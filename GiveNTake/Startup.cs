@@ -7,17 +7,37 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using GiveNTake.Model;
+//using MySql.Data.EntityFrameworkCore.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace GiveNTake
 {
     public class Startup
     {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddMvc();
             services.AddControllersWithViews();
+            services.AddDbContextPool<GiveNTakeContext>(
+                    options =>
+                    options.UseMySql(Configuration["ConnectionStrings:DefaultConnection"],
+                    mySqlOptions =>
+                    {
+                        mySqlOptions.ServerVersion(new Version(8, 0, 17), ServerType.MySql); // replace with your Server Version and Type
+                    }
+            ));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,7 +59,8 @@ namespace GiveNTake
             //});
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
+                endpoints
+                .MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
