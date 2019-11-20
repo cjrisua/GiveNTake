@@ -1,49 +1,50 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace GiveNTake.Model
 {
-    public class GiveNTakeContext : DbContext
+    public class GiveNTakeContext : IdentityDbContext<User>
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<User> Users { get; set; }
+        //public DbSet<User> Users { get; set; }
 
         public GiveNTakeContext(DbContextOptions<GiveNTakeContext> options):
             base(options)
         {
         }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            modelBuilder.Entity<Category>()
+            builder.Entity<Category>()
                 .HasOne(sub => sub.ParentCategory)
                 .WithMany(c => c.Subcategories)
                 .IsRequired(false);
 
-            modelBuilder.Entity<Product>()
+            builder.Entity<Product>()
                 .HasOne(p => p.Category)
                 .WithMany()
                 .IsRequired();
 
-            modelBuilder.Entity<Product>()
+            builder.Entity<Product>()
                 .HasOne(c => c.Owner)
                 .WithMany(u => u.Products)
                 .IsRequired(true);
 
-            modelBuilder.Entity<Message>()
+            builder.Entity<Message>()
                 .HasOne(m => m.Product)
                 .WithMany();
-            modelBuilder.Entity<Message>()
+            builder.Entity<Message>()
                 .HasOne(m => m.FromUser)
                 .WithMany();
-            modelBuilder.Entity<Message>().HasOne(m => m.ToUser)
+            builder.Entity<Message>().HasOne(m => m.ToUser)
                 .WithMany();
 
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
         }
         public void SeedData()
         {
@@ -68,10 +69,10 @@ namespace GiveNTake.Model
             if (!Users.Any())
             {
                 Users.AddRange(
-                    new User() { UserId = "seller1@seller.com" },
-                    new User() { UserId = "seller2@seller.com" },
-                    new User() { UserId = "buyer1@buyer.com" },
-                    new User() { UserId = "buyer2@buyer2.com" });
+                    new User() { Id = "seller1@seller.com" },
+                    new User() { Id = "seller2@seller.com" },
+                    new User() { Id = "buyer1@buyer.com" },
+                    new User() { Id = "buyer2@buyer2.com" });
                 SaveChanges();
             }
         }

@@ -3,14 +3,16 @@ using System;
 using GiveNTake.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GiveNTake.Migrations
 {
     [DbContext(typeof(GiveNTakeContext))]
-    partial class GiveNTakeContextModelSnapshot : ModelSnapshot
+    [Migration("20191119024616_InitialMigration_v0.0.4")]
+    partial class InitialMigration_v004
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

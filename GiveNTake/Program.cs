@@ -24,10 +24,10 @@ namespace GiveNTake
                 var context = services.GetService<GiveNTakeContext>();
                 try
                 {
-                    context.Database.Migrate();
+                    //context.Database.Migrate();
                     context.SeedData();
                 }
-                catch
+                catch (Exception ex)
                 {
                     // Error handling
                 }

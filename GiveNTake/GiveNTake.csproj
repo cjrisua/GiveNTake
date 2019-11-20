@@ -21,5 +21,22 @@
     </PackageReference>
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.0-rc3.final" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Migrations\20191118060909_InitialMigration.cs" />
+    <Compile Remove="Migrations\20191118060404_InitialMigration.Designer.cs" />
+    <Compile Remove="Migrations\20191118060404_InitialMigration.cs" />
+    <Compile Remove="Migrations\20191118060909_InitialMigration.Designer.cs" />
+    <Compile Remove="Migrations\20191118064145_InitialMigration.cs" />
+    <Compile Remove="Migrations\20191119010845_InitialMigration.cs" />
+    <Compile Remove="Migrations\20191118063721_InitialMigration.Designer.cs" />
+    <Compile Remove="Migrations\20191118064145_InitialMigration.Designer.cs" />
+    <Compile Remove="Migrations\20191119010845_InitialMigration.Designer.cs" />
+    <Compile Remove="Migrations\20191119010334_Migration_v0.0.2.Designer.cs" />
+    <Compile Remove="Migrations\20191118063721_InitialMigration.cs" />
+    <Compile Remove="Migrations\GiveNTakeContextModelSnapshot.cs" />
+    <Compile Remove="Migrations\20191119010334_Migration_v0.0.2.cs" />
   </ItemGroup>
 </Project>

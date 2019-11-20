@@ -30,7 +30,7 @@ namespace GiveNTake.Controllers
                     .ForMember(dto => dto.Subcategory, opt => opt.MapFrom(product => product.Category.Name));
 
                 cfg.CreateMap<User, OwnerDTO>()
-                    .ForMember(dto => dto.Id, opt => opt.MapFrom(product => product.UserId));
+                    .ForMember(dto => dto.Id, opt => opt.MapFrom(product => product.Id));
 
                 cfg.CreateMap<City, CityDTO>()
                     .ForMember(dto => dto.Id, opt => opt.MapFrom(city => city.CityId))
