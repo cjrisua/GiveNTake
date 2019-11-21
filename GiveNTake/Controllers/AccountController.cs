@@ -58,6 +58,13 @@ namespace GiveNTake.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpGet("Email")]
+        public ActionResult<string> GetEmail()
+        {
+            return Ok(User.Identity.Name);
+        }
+
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<SuccessfulLoginResult>> Login([FromBody]LoginUserDTO login)
@@ -83,7 +90,12 @@ namespace GiveNTake.Controllers
 
         private async Task<JwtSecurityToken> GenerateTokenAsync(User user)
         {
-            var claims = new List<Claim>();
+            var claims = new List<Claim>() {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName),
+            };
 
             // Loading the user Claims
 
@@ -99,13 +111,17 @@ namespace GiveNTake.Controllers
                 audience: _configuration.GetValue<string>
                 ("JWTConfiguration:Audience"),
                 claims: claims,
-                expires:
-                DateTime.UtcNow.Add(TimeSpan.FromDays(expirationDays)),
+                expires:DateTime.UtcNow.Add(TimeSpan.FromDays(expirationDays)),
                 notBefore: DateTime.UtcNow,
                 signingCredentials: new SigningCredentials(new
                 SymmetricSecurityKey(siginingKey),
                     SecurityAlgorithms.HmacSha256)
             );
+
+            var utc0 = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            var issueTime = DateTime.UtcNow;
+
+            token.Payload.Add("iat", (int)issueTime.Subtract(utc0).TotalSeconds);
 
             return token;
         }

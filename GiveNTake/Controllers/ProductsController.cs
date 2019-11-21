@@ -8,6 +8,7 @@ using GiveNTake.Model;
 using GiveNTake.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GiveNTake.Controllers
 {
@@ -53,12 +54,72 @@ namespace GiveNTake.Controllers
             return new[]{$"Category: {category}, Subcategory: {subcategory}"};
         }
 
+        [AllowAnonymous]
         [HttpGet("cities")]
         public async Task<ActionResult<CityDTO[]>> GetCities()
         {
             var cities = await _context.Cities
                 .ToArrayAsync();
             return _productsMapper.Map<CityDTO[]>(cities);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id}", Name = nameof(GetProduct))]
+        public async Task<ActionResult<ProductDTO>> GetProduct(int id)
+        {
+            var product = await _context.Products
+                .Include(p => p.Owner)
+                .Include(p => p.City)
+                .Include(p => p.Media)
+                .Include(p => p.Category)
+                .ThenInclude(c => c.ParentCategory)
+                .SingleOrDefaultAsync(p => p.ProductId == id);
+
+            return _productsMapper.Map<ProductDTO>(product);
+        }
+
+        [HttpPost("")]
+        public async Task<ActionResult<ProductDTO>> AddNewProduct([FromBody] NewProductDTO newProduct)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Category category = _context.Categories
+                .Include(c => c.ParentCategory)
+                .SingleOrDefault(c => c.Name == newProduct.Subcategory || c.ParentCategory.Name == newProduct.Subcategory);
+
+            if (category == null)
+            {
+                return new BadRequestObjectResult("The provided category and sub category doesnt exist");
+            }
+
+            City city = _context.Cities.SingleOrDefault(c => c.Name == newProduct.City);
+
+            if (city == null)
+            {
+                return new BadRequestObjectResult("The provided city doesnt exist");
+            }
+
+            var user = await _context.Users.FindAsync(User.Identity.Name);
+
+            var product = new Product()
+            {
+                Owner = user,
+                Category = category,
+                Title = newProduct.Title,
+                Description = newProduct.Description,
+                City = city,
+                PublishDate = DateTime.UtcNow
+            };
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(
+                    nameof(GetProduct),
+                    new { id = product.ProductId },
+                    _productsMapper.Map<ProductDTO>(product));
         }
     }
 }

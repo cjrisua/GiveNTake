@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace GiveNTake
 {
@@ -32,8 +34,15 @@ namespace GiveNTake
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddMvc();
-            services.AddControllersWithViews();
+            services.AddMvc( config =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
+
+            //services.AddControllersWithViews();
             services.AddDbContextPool<GiveNTakeContext>(
                     options =>
                     options.UseMySql(Configuration["ConnectionStrings:DefaultConnection"],
@@ -78,6 +87,7 @@ namespace GiveNTake
 
             //Enabling the identity infrastructure
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseRouting();
 

@@ -11,6 +11,6 @@ namespace GiveNTake.Model
         public User Owner { get; set; }
         public City City { get; set; }
         public Category Category { get; set; }
-        public IList<ProductMedia> ProductMedias { get; set; } 
+        public IList<ProductMedia> Media { get; set; } 
     }
 }
